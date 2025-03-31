@@ -1,0 +1,26 @@
+# Archivos y directorios que se deben ignorar
+
+# Archivos de compilación y ejecución
+*.exe
+*.o
+*.obj
+
+# Archivos de configuración de IDE
+.vscode/
+.idea/
+*.iml
+
+# Archivos de logs y reports
+*.txt
+
+# Archivos de cache y temporales
+*.tmp
+*.cache
+
+# Archivos de dependencias de Go
+vendor/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+ehthumbs.db

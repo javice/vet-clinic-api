@@ -1,0 +1,731 @@
+definitions:
+  models.Appointment:
+    properties:
+      completed:
+        default: false
+        type: boolean
+      created_at:
+        type: string
+      date:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      notes:
+        type: string
+      pet_id:
+        type: integer
+      reason:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - date
+    - duration
+    - pet_id
+    - reason
+    type: object
+  models.Client:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      pets:
+        items:
+          $ref: '#/definitions/models.Pet'
+        type: array
+      phone:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - email
+    - name
+    - phone
+    type: object
+  models.Pet:
+    properties:
+      appointments:
+        items:
+          $ref: '#/definitions/models.Appointment'
+        type: array
+      birth_date:
+        type: string
+      breed:
+        type: string
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      species:
+        type: string
+      updated_at:
+        type: string
+      weight:
+        type: number
+    required:
+    - client_id
+    - name
+    - species
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/appointments:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las citas o filtra por mascota si se especifica el
+        parámetro `pet_id`.
+      parameters:
+      - description: ID de la mascota
+        in: query
+        name: pet_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene citas
+      tags:
+      - Appointments
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva cita
+      parameters:
+      - description: Datos de la cita
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Appointment'
+        "400":
+          description: Error en los datos enviados o fecha inválida
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflicto con otra cita
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crea una cita
+      tags:
+      - Appointments
+  /api/v1/appointments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una cita existente
+      parameters:
+      - description: ID de la cita
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cita eliminada exitosamente
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cita no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Elimina cita
+      tags:
+      - Appointments
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una cita
+      parameters:
+      - description: ID de la cita
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Appointment'
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cita no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene cita
+      tags:
+      - Appointments
+    put:
+      consumes:
+      - application/json
+      description: Actualiza una cita existente
+      parameters:
+      - description: ID de la cita
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos de la cita
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Appointment'
+        "400":
+          description: Error en los datos enviados o fecha inválida
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cita o mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflicto con otra cita
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Actualiza cita
+      tags:
+      - Appointments
+  /api/v1/clients:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todos los clientes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Client'
+            type: array
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene clientes
+      tags:
+      - Clients
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo cliente
+      parameters:
+      - description: Datos del cliente
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Client'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Client'
+        "400":
+          description: Error en los datos enviados
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crea cliente
+      tags:
+      - Clients
+  /api/v1/clients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un cliente por su ID
+      parameters:
+      - description: ID del cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cliente eliminado correctamente
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Elimina cliente
+      tags:
+      - Clients
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un cliente específico por su ID
+      parameters:
+      - description: ID del cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Client'
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene cliente por ID
+      tags:
+      - Clients
+    put:
+      consumes:
+      - application/json
+      description: Modifica un cliente total o parcialmente
+      parameters:
+      - description: ID del cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del cliente
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Client'
+        "400":
+          description: Error en los datos enviados
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Modifica cliente
+      tags:
+      - Clients
+  /api/v1/clients/{id}/pets:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las mascotas de un cliente específico
+      parameters:
+      - description: ID del cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Pet'
+            type: array
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene mascotas por cliente
+      tags:
+      - Pets
+  /api/v1/pets:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las mascotas o filtra por cliente si se especifica
+        el parámetro `client_id`.
+      parameters:
+      - description: ID del cliente
+        in: query
+        name: client_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Pet'
+            type: array
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene mascotas
+      tags:
+      - Pets
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva mascota
+      parameters:
+      - description: Datos de la mascota
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Pet'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Pet'
+        "400":
+          description: Error en los datos enviados
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crea mascota
+      tags:
+      - Pets
+  /api/v1/pets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una mascota por su ID
+      parameters:
+      - description: ID de la mascota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mascota eliminada correctamente
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Elimina mascota
+      tags:
+      - Pets
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de una mascota específica por su ID
+      parameters:
+      - description: ID de la mascota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Pet'
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene mascota por ID
+      tags:
+      - Pets
+    put:
+      consumes:
+      - application/json
+      description: Modifica una mascota total o parcialmente
+      parameters:
+      - description: ID de la mascota
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos de la mascota
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Pet'
+        "400":
+          description: Error en los datos enviados
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota o cliente no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Modifica mascota
+      tags:
+      - Pets
+  /api/v1/pets/{id}/appointments:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las citas de una mascota específica
+      parameters:
+      - description: ID de la mascota
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
+        "400":
+          description: Formato de ID inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Mascota no encontrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error interno del servidor
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtiene citas por mascota
+      tags:
+      - Appointments
+swagger: "2.0"

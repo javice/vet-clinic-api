@@ -36,6 +36,10 @@ jobs:
       # Descargar dependencias
       - name: Get dependencies
         run: go mod download
+      
+      # Instalar swag
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
 
       # Ejecutar pruebas
       - name: Run tests

@@ -49,13 +49,13 @@ jobs:
       - name: Build binary
         run: go build -v -o build/vet-clinic-api ./cmd/api/main.go
 
-      # Validar el binario
-      - name: Validate binary
-        run: ./build/vet-clinic-api --help || echo "Binary built successfully"
+      # Verificar que el binario existe
+      - name: Verify binary exists
+        run: ls -l build/vet-clinic-api
 
       # Subir el binario como artefacto
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: vet-clinic-api
           path: build/vet-clinic-api
